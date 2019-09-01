@@ -16,4 +16,5 @@ module.exports = {
 
   NOT_FOUND_ROOM: "방이 없습니다.",
   NOT_CORRECT_PW: "비밀번호 일치하지 않습니다.",
+  SUCCESS_DELETE_ROOM: "방삭제 성공",
 };

@@ -58,4 +58,18 @@ router.get('/room/:id', async (req, res, next) => {
         return next(error);
     }
 });
+
+router.delete('/room/:id', async (req, res, next) => {
+    try {
+        await Room.remove({ _id: req.params.id });
+
+        res.status(200).send(defaultRes.successFalse(statusCode.OK, resMessage.SUCCESS_DELETE_ROOM));
+        setTimeout(() => {
+            req.app.get('io').of('/room').emit('removeRoom', req.params.id);
+        }, 2000);
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
+});
 module.exports = router;
