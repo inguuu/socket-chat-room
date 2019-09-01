@@ -7,6 +7,8 @@ const fs = require('fs');
 const resMessage = require('../module/utils/responseMessage');
 
 const Room = require('../schemas/room');
+const Chat = require('../schemas/chat');
+
 
 router.post('/room', async (req, res, next) => {// 룸 생성하기
     try {
