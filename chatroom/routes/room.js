@@ -40,8 +40,7 @@ router.get('/room/:id', async (req, res, next) => {
         else { //성공 
             const { rooms } = io.of('/chat').adapter;
             if (rooms && rooms[req.params.id] && room.max <= rooms[req.params.id].length) {
-                res.status(200).send(defaultRes.successFalse(statusCode.OK, resMessage.NOT_CORRECT_USERINFO));
-
+                res.status(200).send(defaultRes.successFalse(statusCode.OK, "인원이 꽉찼습니다."));
             }
 
             const chats = await Chat.find({ room: room._id }).sort('createdAt');
@@ -62,6 +61,7 @@ router.get('/room/:id', async (req, res, next) => {
 router.delete('/room/:id', async (req, res, next) => {
     try {
         await Room.remove({ _id: req.params.id });
+        await Chat.remove({ room: req.params.id });
 
         res.status(200).send(defaultRes.successFalse(statusCode.OK, resMessage.SUCCESS_DELETE_ROOM));
         setTimeout(() => {
