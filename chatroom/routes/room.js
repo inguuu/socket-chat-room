@@ -102,7 +102,7 @@ router.post('/room/:id/img', upload.single('img'), async (req, res, next) => {
         });
         await chat.save();
         req.app.get('io').of('/chat').to(req.params.id).emit('chat', chat);
-        res.send('ok');
+        res.send('성공');
     } catch (error) {
         console.error(error);
         next(error);
