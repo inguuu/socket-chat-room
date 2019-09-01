@@ -33,21 +33,26 @@ router.get('/room/:id', async (req, res, next) => {
         const io = req.app.get('io');
         if (!room) {
             res.status(200).send(defaultRes.successFalse(statusCode.OK, resMessage.NOT_FOUND_ROOM));
-            return res.redirect('/');
         }
         else if (room.password && room.password !== req.query.password) {
             res.status(200).send(defaultRes.successFalse(statusCode.OK, resMessage.NOT_CORRECT_PW));
-            return res.redirect('/');
+        }
+        else {
+            const { rooms } = io.of('/chat').adapter;
+            if (rooms && rooms[req.params.id] && room.max <= rooms[req.params.id].length) {
+                res.status(200).send(defaultRes.successFalse(statusCode.OK, resMessage.NOT_CORRECT_USERINFO));
+
+            }
+
+            const chats = await Chat.find({ room: room._id }).sort('createdAt');
+            return res.render('chat', {
+                room,
+                title: room.title,
+                chats,
+                user: req.session.color,
+            });
         }
 
-
-        const chats = await Chat.find({ room: room._id }).sort('createdAt');
-        return res.render('chat', {
-            room,
-            title: room.title,
-            chats,
-            user: req.session.color,
-        });
     } catch (error) {
         console.error(error);
         return next(error);
