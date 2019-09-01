@@ -31,14 +31,16 @@ router.get('/room/:id', async (req, res, next) => {
     try {
         const room = await Room.findOne({ _id: req.params.id });
         const io = req.app.get('io');
-      
-        const chats = await Chat.find({ room: room._id }).sort('createdAt');
-        return res.render('chat', {
-            room,
-            title: room.title,
-            chats,
-            user: req.session.color,
-        });
+        if (!room) {
+            res.status(200).send(defaultRes.successFalse(statusCode.OK, resMessage.NOT_CORRECT_USERINFO));
+            return res.redirect('/');
+        }
+        else if (room.password && room.password !== req.query.password) {
+            res.status(200).send(defaultRes.successFalse(statusCode.OK, resMessage.NOT_CORRECT_USERINFO));
+            return res.redirect('/');
+        }
+
+
     } catch (error) {
         console.error(error);
         return next(error);
