@@ -1,4 +1,4 @@
-# socket-chat-room
+# socket-chatroom
 Node.js로 채팅방 만들기 
 
 ## 목적
