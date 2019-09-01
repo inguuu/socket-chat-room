@@ -11,6 +11,7 @@ Node.js로 채팅방 만들기
 - 채팅방 조회
 - 채팅방 입장
 - 채팅 
+- 이미지 업로드
 
 ## npm
 
@@ -20,8 +21,9 @@ Node.js로 채팅방 만들기
 
 ## 사용된 도구
 
-- Vs Code
+- Visual Studio Code
 - mongoose
+- multer
 - AWS EC2 
 - AWS S3 
 
