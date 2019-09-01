@@ -1,10 +1,10 @@
 var express = require('express');
 var router = express.Router();
 
-
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const resMessage = require('../module/utils/responseMessage');
 
 const Room = require('../schemas/room');
 
@@ -32,15 +32,22 @@ router.get('/room/:id', async (req, res, next) => {
         const room = await Room.findOne({ _id: req.params.id });
         const io = req.app.get('io');
         if (!room) {
-            res.status(200).send(defaultRes.successFalse(statusCode.OK, resMessage.NOT_CORRECT_USERINFO));
+            res.status(200).send(defaultRes.successFalse(statusCode.OK, resMessage.NOT_FOUND_ROOM));
             return res.redirect('/');
         }
         else if (room.password && room.password !== req.query.password) {
-            res.status(200).send(defaultRes.successFalse(statusCode.OK, resMessage.NOT_CORRECT_USERINFO));
+            res.status(200).send(defaultRes.successFalse(statusCode.OK, resMessage.NOT_CORRECT_PW));
             return res.redirect('/');
         }
 
 
+        const chats = await Chat.find({ room: room._id }).sort('createdAt');
+        return res.render('chat', {
+            room,
+            title: room.title,
+            chats,
+            user: req.session.color,
+        });
     } catch (error) {
         console.error(error);
         return next(error);
