@@ -31,13 +31,13 @@ router.get('/room/:id', async (req, res, next) => {
     try {
         const room = await Room.findOne({ _id: req.params.id });
         const io = req.app.get('io');
-        if (!room) {
+        if (!room) {// 방이 없을시 
             res.status(200).send(defaultRes.successFalse(statusCode.OK, resMessage.NOT_FOUND_ROOM));
         }
-        else if (room.password && room.password !== req.query.password) {
+        else if (room.password && room.password !== req.query.password) { // 비밀번호가 틀렸으면
             res.status(200).send(defaultRes.successFalse(statusCode.OK, resMessage.NOT_CORRECT_PW));
         }
-        else {
+        else { //성공 
             const { rooms } = io.of('/chat').adapter;
             if (rooms && rooms[req.params.id] && room.max <= rooms[req.params.id].length) {
                 res.status(200).send(defaultRes.successFalse(statusCode.OK, resMessage.NOT_CORRECT_USERINFO));
