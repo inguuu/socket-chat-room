@@ -28,6 +28,6 @@ module.exports = () => {
     connect();
   });
 
-  require('./chat');
+
   require('./room');
 };
