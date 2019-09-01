@@ -26,4 +26,24 @@ router.post('/room', async (req, res, next) => {// 룸 생성하기
     }
 });
 
+
+router.get('/room/:id', async (req, res, next) => {
+    try {
+        const room = await Room.findOne({ _id: req.params.id });
+        const io = req.app.get('io');
+
+        const chats = await Chat.find({ room: room._id }).sort('createdAt');
+        return res.render('chat', {
+            room,
+            title: room.title,
+            chats,
+            user: req.session.color,
+        });
+    } catch (error) {
+        console.error(error);
+        return next(error);
+    }
+});
+
+
 module.exports = router;
