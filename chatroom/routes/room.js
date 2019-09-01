@@ -102,7 +102,6 @@ router.post('/room/:id/img', upload.single('img'), async (req, res, next) => {
         });
         await chat.save();
         req.app.get('io').of('/chat').to(req.params.id).emit('chat', chat);
-        res.send('성공');
         res.status(200).send(defaultRes.successTrue(statusCode.OK, resMessage.SUCCESS_SEND_IMAGE));
     } catch (error) {
         console.error(error);
