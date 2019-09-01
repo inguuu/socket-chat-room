@@ -92,4 +92,21 @@ router.post('/room/:id/chat', async (req, res, next) => {
         next(error);
     }
 });
+
+router.post('/room/:id/img', upload.single('img'), async (req, res, next) => {
+    try {
+        const chat = new Chat({
+            room: req.params.id,
+            user: req.session.color,
+            img: req.file.filename,
+        });
+        await chat.save();
+        req.app.get('io').of('/chat').to(req.params.id).emit('chat', chat);
+        res.send('ok');
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
+});
+
 module.exports = router;
