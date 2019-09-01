@@ -1,9 +1,11 @@
 var express = require('express');
 var router = express.Router();
 
-const multer = require('multer');
+const upload = require('../../config/multer');
 const path = require('path');
 const fs = require('fs');
+const defaultRes = require('../module/utils/utils');
+const statusCode = require('../module/utils/statusCode');
 const resMessage = require('../module/utils/responseMessage');
 
 const Room = require('../schemas/room');
@@ -84,7 +86,7 @@ router.post('/room/:id/chat', async (req, res, next) => {
         });
         await chat.save();
         req.app.get('io').of('/chat').to(req.params.id).emit('chat', chat);
-        res.send('ok');
+        res.send('성공');
     } catch (error) {
         console.error(error);
         next(error);
