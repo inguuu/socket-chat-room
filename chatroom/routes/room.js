@@ -44,7 +44,7 @@ router.get('/room/:id', async (req, res, next) => {
         else { //성공 
             const { rooms } = io.of('/chat').adapter;
             if (rooms && rooms[req.params.id] && room.max <= rooms[req.params.id].length) {
-                res.status(200).send(defaultRes.successFalse(statusCode.OK, "인원이 꽉찼습니다."));
+                res.status(200).send(defaultRes.successFalse(statusCode.OK, resMessage.FULL_ROOM));
             }
 
             const chats = await Chat.find({ room: room._id }).sort('createdAt');
@@ -86,7 +86,7 @@ router.post('/room/:id/chat', async (req, res, next) => {
         });
         await chat.save();
         req.app.get('io').of('/chat').to(req.params.id).emit('chat', chat);
-        res.send('성공');
+        res.status(200).send(defaultRes.successTrue(statusCode.OK, resMessage.SUCCESS_SEND_CHAT));
     } catch (error) {
         console.error(error);
         next(error);
@@ -103,6 +103,7 @@ router.post('/room/:id/img', upload.single('img'), async (req, res, next) => {
         await chat.save();
         req.app.get('io').of('/chat').to(req.params.id).emit('chat', chat);
         res.send('성공');
+        res.status(200).send(defaultRes.successTrue(statusCode.OK, resMessage.SUCCESS_SEND_IMAGE));
     } catch (error) {
         console.error(error);
         next(error);
