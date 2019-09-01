@@ -1,12 +1,16 @@
 var express = require('express');
 var router = express.Router();
 
-const multer = require('multer');
+const upload = require('../../config/multer');
 const path = require('path');
 const fs = require('fs');
+const defaultRes = require('../module/utils/utils');
+const statusCode = require('../module/utils/statusCode');
 const resMessage = require('../module/utils/responseMessage');
 
 const Room = require('../schemas/room');
+const Chat = require('../schemas/chat');
+
 
 router.post('/room', async (req, res, next) => {// 룸 생성하기
     try {
@@ -40,8 +44,7 @@ router.get('/room/:id', async (req, res, next) => {
         else { //성공 
             const { rooms } = io.of('/chat').adapter;
             if (rooms && rooms[req.params.id] && room.max <= rooms[req.params.id].length) {
-                res.status(200).send(defaultRes.successFalse(statusCode.OK, resMessage.NOT_CORRECT_USERINFO));
-
+                res.status(200).send(defaultRes.successFalse(statusCode.OK, resMessage.FULL_ROOM));
             }
 
             const chats = await Chat.find({ room: room._id }).sort('createdAt');
@@ -62,6 +65,7 @@ router.get('/room/:id', async (req, res, next) => {
 router.delete('/room/:id', async (req, res, next) => {
     try {
         await Room.remove({ _id: req.params.id });
+        await Chat.remove({ room: req.params.id });
 
         res.status(200).send(defaultRes.successFalse(statusCode.OK, resMessage.SUCCESS_DELETE_ROOM));
         setTimeout(() => {
@@ -72,4 +76,37 @@ router.delete('/room/:id', async (req, res, next) => {
         next(error);
     }
 });
+
+router.post('/room/:id/chat', async (req, res, next) => {
+    try {
+        const chat = new Chat({
+            room: req.params.id,
+            user: req.session.color,
+            chat: req.body.chat,
+        });
+        await chat.save();
+        req.app.get('io').of('/chat').to(req.params.id).emit('chat', chat);
+        res.status(200).send(defaultRes.successTrue(statusCode.OK, resMessage.SUCCESS_SEND_CHAT));
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
+});
+
+router.post('/room/:id/img', upload.single('img'), async (req, res, next) => {
+    try {
+        const chat = new Chat({
+            room: req.params.id,
+            user: req.session.color,
+            img: req.file.filename,
+        });
+        await chat.save();
+        req.app.get('io').of('/chat').to(req.params.id).emit('chat', chat);
+        res.status(200).send(defaultRes.successTrue(statusCode.OK, resMessage.SUCCESS_SEND_IMAGE));
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
+});
+
 module.exports = router;
